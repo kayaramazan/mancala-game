@@ -6,10 +6,9 @@ The mancala games are a family of two-player turn-based strategy board games pla
 ## Table Content 
 
 - Setup
-- Mysql
 - Quick Start
-- Creators
-- API
+- End Points
+- Creator
 ## Setup
 The project uses PostgreSQL and NodeJS. I used PostgreSQL on Docker container in this project. NodeJS version is v14.15.1
 ### Postgres
@@ -40,7 +39,7 @@ Run `npm run start` for a dev server. Navigate to `http://localhost:3001/`. The 
         ```
   - `[GET]` http://localhost:3001/game/list 
      -  This endpoint lists all games currently playing.
-## Creators
+## Creator
 
 **Ramazan Kaya**
 
