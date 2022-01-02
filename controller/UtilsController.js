@@ -1,19 +1,21 @@
+require('dotenv').config()
 const crypto = require('crypto');
 const GameController = require('./GameController');
 const gameController = new GameController()
 let games = {}
-const SEED_COUNT = 1
 const PITS_COUNT_PER_USER = 6
-const PLAYER_1 = 'P1'
-const PLAYER_2 = 'P2'
+const PLAYER_1 = process.env.PLAYER_1
+const PLAYER_2 = process.env.PLAYER_2
 
 const swap = (value) => value == PLAYER_1 ? PLAYER_2 : PLAYER_1
 const IsGameFinish = (result) => result.pits[PLAYER_1].every(item => item == 0) || result.pits[PLAYER_2].every(item => item == 0)
 
-// Format the game object for visual
+/**
+ * Format the game object for visual
+ *  */
 const setGamePeriod = (game) => {
     game["pitOrder"] = {}
-    game["pitOrder"][PLAYER_1] = Object.assign(`${game.pits[PLAYER_1].join("  ")}`).split("").reverse().join("");
+    game["pitOrder"][PLAYER_1] = [...game.pits[PLAYER_1]].reverse().join("  ");
     game["pitOrder"][PLAYER_2] = `${game.pits[PLAYER_2].join("  ")}`;
     console.log('here');
 
@@ -50,20 +52,23 @@ const finishGame = async (gameID) => {
  * @returns 
  */
 const calcGamePoints = (game) => {
-    game.players[PLAYER_1] += game.pits[PLAYER_1].reduce((a, b) => a + b, 0)
-    game.players[PLAYER_2] += game.pits[PLAYER_2].reduce((a, b) => a + b, 0)
-    let score = {
-        [PLAYER_1]: game.players[PLAYER_1],
-        [PLAYER_2]: game.players[PLAYER_2]
-    }
-    game = {}
-    game = score
+    return new Promise((res, rej) => {
+        game.players[PLAYER_1] += game.pits[PLAYER_1].reduce((a, b) => a + b, 0)
+        game.players[PLAYER_2] += game.pits[PLAYER_2].reduce((a, b) => a + b, 0)
+        let score = {
+            [PLAYER_1]: game.players[PLAYER_1],
+            [PLAYER_2]: game.players[PLAYER_2]
+        }
+        game = {}
+        game = score
 
-    if (score[PLAYER_1] == score[PLAYER_2])
-        game['result'] = 'DRAW!!'
-    else
-        game['winner'] = score[PLAYER_1] > score[PLAYER_2] ? PLAYER_1 : PLAYER_2
-    return game;
+        if (score[PLAYER_1] == score[PLAYER_2])
+            game['result'] = 'DRAW!!'
+        else
+            game['winner'] = score[PLAYER_1] > score[PLAYER_2] ? PLAYER_1 : PLAYER_2
+        res(game);
+    })
+
 }
 class UtilsController {
 
@@ -151,7 +156,7 @@ UtilsController.prototype.makeAttack = async (req, res, next) => {
         //change game turn 
         game.currentPlayer = swap(game.currentPlayer)
     }
-    gameController.attack(game,req.body).catch(err => console.log(err))
+    gameController.attack(game, req.body).catch(err => console.log(err))
     next()
 
 }
@@ -185,7 +190,7 @@ UtilsController.prototype.checkGameStatus = async (req, res, next) => {
         return res.json(setGamePeriod(game))
 
     // if game just finish
-    let gameResult = calcGamePoints(game)
+    let gameResult = await calcGamePoints(game)
     finishGame(game.gameID)
     return res.json({ message: 'Game Over', gameResult })
 }

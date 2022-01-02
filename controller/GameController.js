@@ -1,10 +1,11 @@
 
 const crypto = require('crypto');
+require('dotenv').config()
 const db = require('../db');
-const SEED_COUNT = 1
+const SEED_COUNT = 6
 const PITS_COUNT_PER_USER = 6
-const PLAYER_1 = 'P1'
-const PLAYER_2 = 'P2'
+const PLAYER_1 = process.env.PLAYER_1
+const PLAYER_2 =  process.env.PLAYER_2
 const chooseRandomFirstPlayer = () => Math.round(Math.random()) ? PLAYER_1 : PLAYER_2
 
 class GameController {
@@ -30,8 +31,6 @@ GameController.prototype.createNewGame = (gameID) =>
                 [PLAYER_2]: Array(PITS_COUNT_PER_USER).fill(SEED_COUNT)
             },
             players: { [PLAYER_1]: 0, [PLAYER_2]: 0 },
-            player1Cup: 0,
-            player2Cup: 0,
             currentPlayer: chooseRandomFirstPlayer()
         }
         if (db) {
@@ -80,7 +79,6 @@ GameController.prototype.deleteGame = (gameID) =>
         if (db) {
             db.query("DELETE FROM TBL_GAME WHERE game_id = $1", [gameID], (err, response) => {
                 if (err) rej(err)
-                console.log('deleted', response);
                 res(response)
             })
         }
@@ -102,7 +100,6 @@ GameController.prototype.attack = (game, body) => {
     let gameController = new GameController()
     gameController.updateGame(game, body)
     let { currentPlayer: pitSide, pitNumber } = body
-    console.log(pitSide, pitNumber)
     return new Promise((res, rej) => {
         db.query("INSERT INTO ATTACK (GAME_ID,ATTACKER_PLAYER,PIT_NUMBER)VALUES($1,$2,$3)", [game.gameID, pitSide, pitNumber], (err, response) => {
             if (err) rej(err)

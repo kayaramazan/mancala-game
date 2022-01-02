@@ -10,9 +10,9 @@ POST http://localhost:3001/game/attack HTTP/1.1
 content-type: application/json
 
 {
-    "gameID":"83439f3c2199370482da33994915bf314d4d3336",
+    "gameID":"3a7e708b5e6e9aa7cc5a84f22a64cf1916688ce9",
     "currentPlayer":"P1",
-    "pitNumber":6
+    "pitNumber":3
 }
 
 ###
@@ -21,7 +21,7 @@ POST http://localhost:3001/game/attack HTTP/1.1
 content-type: application/json
 
 {
-    "gameID":"83439f3c2199370482da33994915bf314d4d3336",
+    "gameID":"3a7e708b5e6e9aa7cc5a84f22a64cf1916688ce9",
     "currentPlayer":"P2",
     "pitNumber":4
 }
